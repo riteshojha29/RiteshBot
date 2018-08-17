@@ -1,0 +1,8 @@
+url:http://www.yahoo.com
+name:Ritesh
+email:ritesh.ojha29@gmail.com
+gender:male
+botmaster:Ritesh Ojha
+organization:FreeLancer
+version:1.0.1
+

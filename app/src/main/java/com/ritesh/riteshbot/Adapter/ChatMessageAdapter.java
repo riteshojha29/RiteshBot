@@ -5,10 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
-
 
 import com.ritesh.riteshbot.Pojo.ChatMessage;
 import com.ritesh.riteshbot.R;
@@ -19,7 +16,7 @@ import java.util.List;
  * Created by Ritesh on 16/08/18.
  */
 public class ChatMessageAdapter extends RecyclerView.Adapter  {
-    private static final int MY_MESSAGE = 0, OTHER_MESSAGE = 1, MY_IMAGE = 2, OTHER_IMAGE = 3;
+    private static final int MY_MESSAGE = 1, OTHER_MESSAGE = 2;
 
     private Context mContext;
     private List<ChatMessage> mMessageList;
@@ -34,30 +31,58 @@ public class ChatMessageAdapter extends RecyclerView.Adapter  {
         return mMessageList.size();
     }
 
-    public ChatMessage getItem(int position) {
-        return mMessageList.get(position);
-    }
-
     @Override
     public int getItemViewType(int position) {
-        ChatMessage item = getItem(position);
+        ChatMessage item = mMessageList.get(position);
 
-        if (item.isMine() && !item.isImage()) return MY_MESSAGE;
-        else if (!item.isMine() && !item.isImage()) return OTHER_MESSAGE;
-        else if (item.isMine() && item.isImage()) return MY_IMAGE;
-        else return OTHER_IMAGE;
+        if (item.isMine()) return MY_MESSAGE;
+        else return OTHER_MESSAGE;
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view;
+
+        if (viewType == MY_MESSAGE) {
+            view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_mine_message, parent, false);
+            return new ChatMessageHolder(view);
+        } else if (viewType == OTHER_MESSAGE) {
+            view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_other_message, parent, false);
+            return new ChatMessageHolder(view);
+        }
+
         return null;
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        ChatMessage message = mMessageList.get(position);
 
+        switch (holder.getItemViewType()) {
+            case MY_MESSAGE:
+                ((ChatMessageHolder) holder).bind(message);
+                break;
+            case OTHER_MESSAGE:
+                ((ChatMessageHolder) holder).bind(message);
+        }
     }
 
+
+    private class ChatMessageHolder extends RecyclerView.ViewHolder {
+        TextView messageText;
+
+        ChatMessageHolder(View itemView) {
+            super(itemView);
+
+            messageText = (TextView) itemView.findViewById(R.id.text_message_body);
+        }
+
+        void bind(ChatMessage message) {
+            messageText.setText(message.getContent());
+        }
+    }
 }
 
 

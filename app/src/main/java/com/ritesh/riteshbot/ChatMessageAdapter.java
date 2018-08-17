@@ -1,4 +1,4 @@
-package com.ritesh.riteshbot.Adapter;
+package com.ritesh.riteshbot;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.ritesh.riteshbot.Pojo.ChatMessage;
+import com.ritesh.riteshbot.ChatMessage;
 import com.ritesh.riteshbot.R;
 
 import java.util.List;
@@ -46,11 +46,11 @@ public class ChatMessageAdapter extends RecyclerView.Adapter  {
         if (viewType == MY_MESSAGE) {
             view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.item_mine_message, parent, false);
-            return new ChatMessageHolder(view);
+            return new SendMessageHolder(view);
         } else if (viewType == OTHER_MESSAGE) {
             view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.item_other_message, parent, false);
-            return new ChatMessageHolder(view);
+            return new RecieveMessageHolder(view);
         }
 
         return null;
@@ -62,21 +62,35 @@ public class ChatMessageAdapter extends RecyclerView.Adapter  {
 
         switch (holder.getItemViewType()) {
             case MY_MESSAGE:
-                ((ChatMessageHolder) holder).bind(message);
+                ((SendMessageHolder) holder).bind(message);
                 break;
             case OTHER_MESSAGE:
-                ((ChatMessageHolder) holder).bind(message);
+                ((RecieveMessageHolder) holder).bind(message);
         }
     }
 
 
-    private class ChatMessageHolder extends RecyclerView.ViewHolder {
+    private class SendMessageHolder extends RecyclerView.ViewHolder {
         TextView messageText;
 
-        ChatMessageHolder(View itemView) {
+        SendMessageHolder(View itemView) {
             super(itemView);
 
-            messageText = (TextView) itemView.findViewById(R.id.text_message_body);
+            messageText = itemView.findViewById(R.id.text_message_body);
+        }
+
+        void bind(ChatMessage message) {
+            messageText.setText(message.getContent());
+        }
+    }
+
+    private class RecieveMessageHolder extends RecyclerView.ViewHolder {
+        TextView messageText;
+
+        RecieveMessageHolder(View itemView) {
+            super(itemView);
+
+            messageText = itemView.findViewById(R.id.text_message_body);
         }
 
         void bind(ChatMessage message) {

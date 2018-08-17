@@ -1,4 +1,4 @@
-package com.ritesh.riteshbot.Pojo;
+package com.ritesh.riteshbot;
 
 public class ChatMessage {
     private boolean isMine;

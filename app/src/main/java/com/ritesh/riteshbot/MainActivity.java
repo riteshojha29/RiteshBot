@@ -7,12 +7,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-
-import com.ritesh.riteshbot.Adapter.ChatMessageAdapter;
-import com.ritesh.riteshbot.Pojo.ChatMessage;
 
 import org.alicebot.ab.AIMLProcessor;
 import org.alicebot.ab.Bot;
@@ -32,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private RecyclerView mListView;
     private Button mButtonSend;
@@ -51,24 +49,19 @@ public class MainActivity extends AppCompatActivity {
         mButtonSend = findViewById(R.id.btn_send);
         mEditTextMessage = findViewById(R.id.edittext_chatbox);
 
-        setAdapter();
+        mButtonSend.setOnClickListener(this);
 
-        mButtonSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String message = mEditTextMessage.getText().toString();
-                //bot
-                String response = chat.multisentenceRespond(mEditTextMessage.getText().toString());
-                if (TextUtils.isEmpty(message)) {
-                    return;
-                }
-                sendMessage(message);
-                mimicOtherMessage(response);
-                mEditTextMessage.setText("");
-            }
-        });
-        //checking SD card availablility
-        boolean a = isSDCARDAvailable();
+
+
+
+/*        //checking SD card availablility
+        boolean a = Utils.isSDCARDAvailable();*/
+        copyAssets();
+
+        setAdapter();
+    }
+
+    private void copyAssets() {
         //receiving the assets from the app directory
         AssetManager assets = getResources().getAssets();
         File jayDir = new File(Environment.getExternalStorageDirectory().toString() + "/hari/bots/Hari");
@@ -108,9 +101,6 @@ public class MainActivity extends AppCompatActivity {
         //Assign the AIML files to bot for processing
         bot = new Bot("BotAssets", MagicStrings.root_path, "chat");
         chat = new Chat(bot);
-        String[] args = null;
-        mainFunction(args);
-
     }
 
     private void sendMessage(String message) {
@@ -136,10 +126,7 @@ public class MainActivity extends AppCompatActivity {
     }*/
 
 
-    //check SD card availability
-    public static boolean isSDCARDAvailable(){
-        return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)? true :false;
-    }
+
 
     //copying the file
     private void copyFile(InputStream in, OutputStream out) throws IOException {
@@ -151,30 +138,48 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //Request and response of user and the bot
-    public static void mainFunction (String[] args) {
+    public void botSetup() {
         MagicBooleans.trace_mode = false;
-        System.out.println("trace mode = " + MagicBooleans.trace_mode);
         Graphmaster.enableShortCuts = true;
         Timer timer = new Timer();
         String request = "Hello.";
         String response = chat.multisentenceRespond(request);
 
-        System.out.println("Human: "+request);
-        System.out.println("Robot: " + response);
+        Log.d("Bot","trace mode = " + MagicBooleans.trace_mode);
+        Log.d("Bot","Human: "+request);
+        Log.d("Bot","Robot: " + response);
     }
 
     private void updateList(ChatMessage chatMessage) {
-        chatMessageList.add(chatMessageList.size(), chatMessage);
-        mAdapter.notifyItemInserted(chatMessageList.size());
-        mListView.scrollToPosition(chatMessageList.size() - 1);
+        chatMessageList.add(/*chatMessageList.size(), */chatMessage);
+        mAdapter.notifyDataSetChanged();
+//        mAdapter.notifyItemInserted(chatMessageList.size());
+//        mListView.scrollToPosition(chatMessageList.size() - 1);
     }
 
     private void setAdapter() {
+        botSetup();
+
         if (chatMessageList.size() == 0)
             chatMessageList.add(0, new ChatMessage("Hi there! A warm welcome. I'm Ritesh, here to assist you ", false));
 
         mAdapter = new ChatMessageAdapter(this, chatMessageList);
+        mListView.setHasFixedSize(true);
         mListView.setLayoutManager(new LinearLayoutManager(this));
+        
         mListView.setAdapter(mAdapter);
+    }
+
+    @Override
+    public void onClick(View view) {
+        String message = mEditTextMessage.getText().toString();
+        //bot
+        String response = chat.multisentenceRespond(mEditTextMessage.getText().toString());
+        if (TextUtils.isEmpty(message)) {
+            return;
+        }
+        sendMessage(message);
+        mimicOtherMessage(response);
+        mEditTextMessage.setText("");
     }
 }
